@@ -5,49 +5,71 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.example.LoginPageElements;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import pageobjects.HomePage;
 import utils.DriverActions;
 
 import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class LoginSteps {
+public class LoginSteps extends HomePage {
     private WebDriverWait wait;
-    private final String VALID_USERNAME = "Admin";
-    private final String VALID_PASSWORD = "admin123";
+
 
     @Before
     public void setup() {
         this.wait = new WebDriverWait(DriverActions.getDriver(), Duration.ofSeconds(10));
     }
 
-    @Given("La usuario está en la página de inicio de sesión {string}")
-    public void userIsOnLoginPage(String url) {
+    @Given("home {string}")
+    public void userHomePage(String url) {
         DriverActions.openURL(url);
         DriverActions.maximizeWindow();
     }
 
-    @When("La usuario introduce credenciales válidas")
-    public void userEntersValidCredentials() {
-        DriverActions.waitAndSendKeys(LoginPageElements.USERNAME_FIELD, VALID_USERNAME);
-        DriverActions.waitAndSendKeys(LoginPageElements.PASSWORD_FIELD, VALID_PASSWORD);
-        DriverActions.click(LoginPageElements.LOGIN_BUTTON);
+    @When("navego a la sección {string}")
+    public void navigateToSection(String sectionName) {
+        sectionAmor();
     }
 
-    @Then("El usuario debe ser redirigido a la página de inicio.")
-    public void userIsRedirectedToHomepage() {
-        String expectedUrl = "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index";
-        assertEquals(expectedUrl, DriverActions.getCurrentUrl());
+    @When("espero que los productos se carguen y seleccionar primer producto")
+    public void selectFirstProduct() {
+        addProductsToCart1();
+        DriverActions.pauseForMilliseconds(5000);
     }
 
-    @Then("Debería mostrarse un mensaje de bienvenida")
-    public void welcomeMessageIsDisplayed() {
-        WebElement mensaje = DriverActions.waitForElement(LoginPageElements.WELCOME_MESSAGE);
-        assertTrue(mensaje.isDisplayed());
+    @When("regresar a seccion amor y seleccionar 2do producto")
+    public void selectSecondProduct() {
+        sectionAmor();
+        addProductsToCart2();
+        DriverActions.pauseForMilliseconds(5000);
+    }
+
+    @Then("los dos productos deberían estar en el carro de compras")
+    public void verifyProductsInCart() {
+        String textoObtenido = setText();
+        String textoEsperado = "2"; // Cambia esto al valor que esperas
+
+        assertEquals("El producto en el carrito no coincide", textoEsperado, textoObtenido);
+    }
+
+    @When("navego a la sección cumple")
+    public void navigateToSectionC(String sectionName) {
+        sectionCumpleanos();
+    }
+
+    @When("eliminar objeto")
+    public void deletProduct() {
+        deleteProduct();
+    }
+
+    @Then("no se visualizara ningun objeto en carrito")
+    public void verifyDeletProduct() {
+        String textoObtenido = setText();
+        String textoEsperado = "Tu carrito está vacío."; // Cambia esto al valor que esperas
+
+        assertEquals("El producto en el carrito no coincide", textoEsperado, textoObtenido);
     }
 
     @After
